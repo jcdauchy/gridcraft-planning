@@ -176,6 +176,24 @@ gridcraft-cli cat budget.xlsx --range B4:F15                   # aligned text ta
 gridcraft-cli commands --search chart                          # every command and its params
 ```
 
+### Two ways to connect Claude Code over MCP
+
+| Mode | What happens | Register | Windows launcher |
+|---|---|---|---|
+| **1. Headless** | Claude Code starts `gridcraft-cli` itself and edits a workbook in memory; no window. Best for batch work and saving files (`--out`). | `claude mcp add --scope user gridcraft -- gridcraft-cli mcp [--in book.xlsx]` | `gridcraft-mcp-headless.bat [book.xlsx]` |
+| **2. Live** | You open the GridCraft window with a control channel and the MCP server is bridged to it, so you watch every change as it happens. | `claude mcp add --scope user gridcraft-live -- gridcraft-cli mcp --connect 7979` | `gridcraft-mcp-live.bat [book.xlsx] [port]` |
+
+Both launchers default to `Planning seniors.xlsm` in the same folder when no workbook is given.
+For mode 2 the window must be running before Claude uses the tools:
+
+```sh
+gridcraft --control 7979                  # or: gridcraft book.xlsx --control 7979
+```
+
+Restart Claude Code (or open a new session) after registering so the tools load. Use full paths
+to the executables if they are not on your `PATH`; `claude mcp list` shows whether each server connects
+(`gridcraft-live` only shows as connected while the window is open).
+
 The MCP server offers tools such as `read_range`, `write_range`, `set_cell`, `evaluate_formula`,
 `format_range`, `insert_chart`, `create_table`, `sort_range`, `filter` and `execute_command`
 (which reaches every one of GridCraft's commands). The desktop app's control channel adds real

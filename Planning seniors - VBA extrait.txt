@@ -1,0 +1,1212 @@
+﻿olevba 0.60.2 on Python 3.12.0 - http://decalage.info/python/oletools
+===============================================================================
+FILE: C:\Users\jcdau\AppData\Local\Temp\claude\C--code-gridcraft\8037c743-1345-4e09-b8ff-dafdd235bda5\scratchpad\work\planning.xlsm
+Type: OpenXML
+WARNING  For now, VBA stomping cannot be detected for files in memory
+-------------------------------------------------------------------------------
+VBA MACRO Feuil1.cls 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/Feuil1'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Option Explicit
+
+Private Sub CommandButton1_Click()
+UserFormParametres.Show 0
+End Sub
+
+Private Sub Worksheet_Deactivate()
+UnloadAllForms
+End Sub
+
+Private Sub Worksheet_SelectionChange(ByVal target As Range)
+If UserFormAstreintes.Visible = True Then
+    Maj_recap_astreintes
+End If
+End Sub
+-------------------------------------------------------------------------------
+VBA MACRO ThisWorkbook.cls 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/ThisWorkbook'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Private Sub Workbook_BeforeClose(Cancel As Boolean)
+Calendrier_MiseEnForme
+
+Application.ScreenUpdating = False
+For i = 2 To 7
+G_sh(i).Visible = False
+Next i
+
+Dim num_jour As Long
+num_jour = DateDiff("d", G_sh(1).Range("C9").Value, Day(Date) & "/" & Month(Date) & "/" & G_an) + 9
+
+If num_jour > 15 Then
+ActiveWindow.ScrollRow = num_jour - 15
+ElseIf num_jour < 16 Then
+ActiveWindow.ScrollRow = 13
+End If
+
+Application.ScreenUpdating = True
+
+End Sub
+
+Private Sub Workbook_BeforeSave(ByVal SaveAsUI As Boolean, Cancel As Boolean)
+constantes_generales
+G_sh(1).Activate
+For i = 2 To 7
+G_sh(i).Visible = False
+Next i
+End Sub
+
+Private Sub Workbook_Open()
+
+On Error GoTo gestionerreur
+
+Application.ScreenUpdating = False
+constantes_generales
+G_sh(1).Activate
+
+Dim num_jour As Long
+num_jour = DateDiff("d", G_sh(1).Range("C9").Value, Day(Date) & "/" & Month(Date) & "/" & G_an) + 9
+
+If num_jour > 15 Then
+ActiveWindow.ScrollRow = num_jour - 15
+ElseIf num_jour < 16 Then
+ActiveWindow.ScrollRow = 13
+End If
+
+gestionerreur:
+Application.ScreenUpdating = True
+
+End Sub
+-------------------------------------------------------------------------------
+VBA MACRO Semaine_type.bas 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/Semaine_type'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Option Explicit
+
+Sub Copiercollerstype(Buttonname As String)
+
+If Buttonname = "" Then
+Exit Sub
+End If
+
+Application.ScreenUpdating = False
+constantes_generales
+Dim col_select, row_select, row_medecin, Week_day, Week_num, col_debut As Long
+
+col_select = ActiveCell.Column
+row_select = ActiveCell.Row
+Week_day = Weekday(CDate(Range("C" & row_select).Value), 2) 'Jour de la semaine
+Week_num = Format(G_sh(1).Range("C" & row_select).Value, "ww", vbMonday, vbFirstFourDays) 'Numéro de semaine
+row_medecin = Application.Match(Buttonname, G_sh(3).Range("C1:C30"), 0) 'Numéro ligne du médecin dans la feuille "Liste medecins"
+
+'Vérifier si semaine paire ou impaire
+If Week_num Mod 2 = 0 Then 'Si semaine paire  'colonne début dans Liste medecin = N (Soit 14)
+col_debut = 14
+Else 'Si semaine impaire 'Colonne début dans liste medecins = X soit 24
+col_debut = 24
+End If
+
+'On applique à partir du tableau dans Liste medecins, après avoir vérifié si jour férié
+If col_select > 3 And col_select < 21 Then
+For i = Week_day To 5
+If Not IsError(Application.Match(G_sh(1).Cells(row_select + i - Week_day, 3), Worksheets("Paramètres").Range("R2:R14"), 0)) Then
+G_sh(1).Cells(row_select + i - Week_day, col_select).Value = ""
+G_sh(1).Cells(row_select + i - Week_day, col_select + 1).Value = ""
+Else
+G_sh(1).Cells(row_select + i - Week_day, col_select).Value = G_sh(3).Cells(row_medecin, col_debut + 2 * (i - 1)).Value
+G_sh(1).Cells(row_select + i - Week_day, col_select + 1).Value = G_sh(3).Cells(row_medecin, col_debut + 2 * (i - 1) + 1).Value
+End If
+Next i
+ElseIf col_select > 47 Then
+For i = Week_day To 5
+G_sh(1).Cells(row_select + i - Week_day, col_select).Value = Buttonname
+Next i
+End If
+Application.ScreenUpdating = True
+
+End Sub
+-------------------------------------------------------------------------------
+VBA MACRO A_constantes_générales.bas 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/A_constantes_générales'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Option Explicit
+
+Public G_col_bord(1 To 30), G_col_calend(1 To 30) As String
+Public i, u, G_lastrow(0 To 12), G_firstrow(0 To 13), G_an As Long
+Public G_sh(1 To 9) As Worksheet
+Public test As String
+
+Public Sub constantes_generales()
+
+G_an = ThisWorkbook.Names("An").RefersToRange.Value
+
+'!! Colonnes des bordures !!
+G_col_bord(1) = "D": G_col_bord(2) = "U" 'Secteurs séniors
+G_col_bord(3) = "V": G_col_bord(4) = "Y" 'Permanence de soins
+G_col_bord(5) = "Z": G_col_bord(6) = "AC" 'Urgences
+G_col_bord(7) = "AD": G_col_bord(8) = "AO" 'Secteurs internes
+G_col_bord(23) = "AP": G_col_bord(24) = "AS" '1/2 journées formation internes
+G_col_bord(21) = "AT": G_col_bord(22) = "AZ" 'Formation et congés internes
+G_col_bord(9) = "BA": G_col_bord(10) = "BH" 'Congés
+G_col_bord(15) = "BI": G_col_bord(16) = "BN" 'Temps partiel
+G_col_bord(11) = "BO": G_col_bord(12) = "BR" 'Formation
+G_col_bord(13) = "BS": G_col_bord(14) = "BV" 'Télétravail
+G_col_bord(17) = "BW": G_col_bord(18) = "CD" 'Desiderata congés
+G_col_bord(19) = "B": G_col_bord(20) = "C" 'Menu
+
+'!! Colonnes des différentes sections du calendrier !!
+G_col_calend(13) = "V": G_col_calend(14) = "V" 'Range Nuits astreintes -> RT(7)
+
+G_col_calend(1) = G_col_bord(1): G_col_calend(2) = G_col_bord(18) 'Range Total -> (RT(1)
+G_col_calend(3) = G_col_bord(1): G_col_calend(4) = G_col_bord(8) 'Range HORS vacances 1 -> RT(2)
+G_col_calend(5) = G_col_bord(11): G_col_calend(6) = G_col_bord(14) 'Range HORS vacances 2 -> RT(3)
+G_col_calend(7) = G_col_bord(21): G_col_calend(8) = G_col_bord(18) 'Range Vacances -> RT(4)
+G_col_calend(9) = G_col_bord(19): G_col_calend(10) = G_col_bord(20) 'Range Menu -> RT(5)
+G_col_calend(11) = G_col_bord(5): G_col_calend(12) = G_col_bord(5) 'Range urgences -> RT(6)
+G_col_calend(15) = G_col_bord(17): G_col_calend(16) = G_col_bord(18) 'Range Vacances 2 -> RT(8)
+G_col_calend(17) = G_col_bord(7): G_col_calend(18) = G_col_bord(8) 'Range Internes -> RT(9)
+G_col_calend(19) = G_col_bord(1): G_col_calend(20) = G_col_bord(2) 'Secteur séniors -> RT(10)
+
+'!! Définition des différentes feuilles !!
+Set G_sh(1) = Worksheets("Calendrier")
+Set G_sh(2) = Worksheets("Paramètres")
+Set G_sh(3) = Worksheets("Liste medecins")
+Set G_sh(4) = Worksheets("Liste internes")
+Set G_sh(5) = Sheets("Astreinte Administration")
+Set G_sh(6) = Sheets("Urgences")
+Set G_sh(7) = Sheets("Astreinte AVEC")
+Set G_sh(8) = Sheets("Récapitulatif")
+Set G_sh(9) = Sheets("Répartition")
+
+'!! Première et dernière lignes du mois
+For i = 1 To 12
+G_firstrow(i) = G_sh(2).Range("Z" & (i + 1)).Value
+G_lastrow(i) = G_sh(2).Range("AA" & (i + 1)).Value
+Next i
+
+End Sub
+
+
+-------------------------------------------------------------------------------
+VBA MACRO Feuil9.cls 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/Feuil9'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Option Explicit
+
+Private Sub CommandButton1_Click()
+Worksheets("calendrier").Select
+End Sub
+
+Private Sub CommandButton3_Click()
+Worksheets("calendrier").Select
+UserFormParametres.Show 0
+End Sub
+-------------------------------------------------------------------------------
+VBA MACRO Changement_annee.bas 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/Changement_annee'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Option Explicit
+
+Public Sub changeyear(new_year As Long)
+
+constantes_generales
+Dim addr As String
+
+Application.ScreenUpdating = False
+Stop_protect
+Application.EnableEvents = False
+
+addr = ThisWorkbook.Path & "\" & "Planning séniors " & new_year & ".xlsm"
+
+'Vérification si le planning existe déjà dans le répertoire
+If Not Dir(addr) = "" Then
+MsgBox "Il existe déjà un planning pour cette année là dans le dossier. Merci de le déplacer ou le supprimer au préalable puis rappuyez."
+GoTo fin
+End If
+
+'On applique la nouvelle année
+G_sh(2).Range("R16").Value = new_year
+
+constantes_generales
+
+G_sh(1).Activate
+G_sh(1).Select
+
+G_sh(1).Range("C374").Value = ""
+G_sh(1).Range("A374:CC374").Select
+    Selection.Borders(xlEdgeLeft).LineStyle = xlNone
+    Selection.Borders(xlEdgeTop).LineStyle = xlNone
+    Selection.Borders(xlEdgeBottom).LineStyle = xlNone
+    Selection.Borders(xlEdgeRight).LineStyle = xlNone
+    Selection.Borders(xlInsideVertical).LineStyle = xlNone
+    Selection.Borders(xlInsideHorizontal).LineStyle = xlNone
+    With Selection.Interior
+        .PatternColorIndex = xlAutomatic
+        .ThemeColor = xlThemeColorDark1
+        .TintAndShade = 0
+        .PatternTintAndShade = 0
+    End With
+    
+'Suppression des données actuelles
+G_sh(1).Range("D9:CL374").Select
+Selection.ClearContents
+
+'Ajout des dates dans la colonne C
+G_sh(1).Range("C9").Value = "01/01/" & new_year
+For i = 1 To G_sh(2).Range("R17").Value - 1
+G_sh(1).Range("C" & (9 + i)).Value = DateAdd("d", 1, G_sh(1).Range("C" & (8 + i)).Value)
+Next i
+
+'Suppression fusions cellules colonne A
+For i = 9 To 374
+If G_sh(1).Range("A" & i).MergeCells = True Then
+G_sh(1).Range("A" & i).UnMerge
+End If
+Next i
+
+'On crée les nouvelles fusions pour la colonne A
+Application.DisplayAlerts = False
+For i = 1 To 12
+G_sh(1).Range("A" & G_firstrow(i)).Value = Worksheets("Paramètres").Range("W" & i + 1).Value
+G_sh(1).Range("A" & G_firstrow(i) + 15).Value = Worksheets("Paramètres").Range("W" & i + 1).Value
+            With G_sh(1).Range("A" & G_firstrow(i) & ":A" & G_lastrow(i))
+                .Borders(xlEdgeTop).Weight = xlThick
+                .Borders(xlEdgeBottom).Weight = xlThick
+                .Borders(xlEdgeRight).Weight = xlMedium
+            End With
+G_sh(1).Range("A" & G_firstrow(i) & ":A" & G_firstrow(i) + 14).Merge
+G_sh(1).Range("A" & G_firstrow(i) + 15 & ":A" & G_lastrow(i)).Merge
+Next i
+Application.DisplayAlerts = True
+
+Calendrier_MiseEnForme
+
+ThisWorkbook.SaveAs addr
+
+fin:
+Application.EnableEvents = True
+Start_protect
+Application.ScreenUpdating = True
+End Sub
+-------------------------------------------------------------------------------
+VBA MACRO Feuil6.cls 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/Feuil6'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+(empty macro)
+-------------------------------------------------------------------------------
+VBA MACRO Feuil7.cls 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/Feuil7'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Option Explicit
+
+Private Sub CommandButton1_Click()
+Worksheets("calendrier").Select
+UserFormParametres.Show 0
+End Sub
+
+Private Sub CommandButton2_Click()
+Worksheets("calendrier").Select
+End Sub
+-------------------------------------------------------------------------------
+VBA MACRO Feuil14.cls 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/Feuil14'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Option Explicit
+
+Private Sub CommandButton1_Click()
+Worksheets("calendrier").Select
+End Sub
+
+Private Sub CommandButton2_Click()
+Worksheets("calendrier").Select
+UserFormParametres.Show 0
+End Sub
+
+Private Sub Worksheet_Activate()
+ActiveSheet.Range("A1").Select
+End Sub
+
+Private Sub Worksheet_BeforeDoubleClick(ByVal target As Range, Cancel As Boolean)
+Dim nbjoursmois As Long
+nbjoursmois = ThisWorkbook.Names("nb_jours_mois").RefersToRange.Value
+
+If target.Column = 2 Or target.Column = 5 Or target.Column = 8 Or target.Column = 11 Then
+ActiveSheet.Range(Cells(5, target.Column - 1), Cells(4 + nbjoursmois, target.Column)).Select
+Selection.Copy
+End If
+End Sub
+-------------------------------------------------------------------------------
+VBA MACRO Feuil2.cls 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/Feuil2'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Option Explicit
+
+Private Sub CommandButton1_Click()
+Worksheets("calendrier").Select
+End Sub
+
+Private Sub CommandButton2_Click()
+Worksheets("calendrier").Select
+UserFormParametres.Show 0
+End Sub
+
+-------------------------------------------------------------------------------
+VBA MACRO Export.bas 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/Export'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Option Explicit
+
+Public Function Export_Pdf(type_doc As String)
+
+constantes_generales
+Dim LaDate As String
+
+Application.ScreenUpdating = False
+
+LaDate = Format(DateSerial(G_sh(2).Range("R16").Value, G_sh(2).Range("R18").Value, 1), "yyyy.mm")
+
+If type_doc = "Administration" Then
+G_sh(5).Visible = True
+G_sh(5).ExportAsFixedFormat Type:=xlTypePDF, Filename:=ThisWorkbook.Path & "\" & LaDate & " - Gardes et astreintes médecine interne" & ".pdf", _
+    Quality:=xlQualityStandard, IncludeDocProperties:=True, IgnorePrintAreas:=False, From:=1, To:=1, OpenAfterPublish:=True
+G_sh(5).Visible = False
+
+ElseIf type_doc = "Urgences" Then
+G_sh(6).Visible = True
+G_sh(6).ExportAsFixedFormat Type:=xlTypePDF, Filename:=ThisWorkbook.Path & "\" & LaDate & " - Gestion des entrées médecine interne" & ".pdf", _
+    Quality:=xlQualityStandard, IncludeDocProperties:=True, IgnorePrintAreas:=False, From:=1, To:=1, OpenAfterPublish:=True
+G_sh(6).Visible = False
+
+ElseIf type_doc = "Repart" Then
+G_sh(9).Visible = True
+G_sh(9).ExportAsFixedFormat Type:=xlTypePDF, Filename:=ThisWorkbook.Path & "\" & LaDate & " - Répartition internes" & ".pdf", _
+    Quality:=xlQualityStandard, IncludeDocProperties:=True, IgnorePrintAreas:=False, From:=1, To:=1, OpenAfterPublish:=True
+G_sh(9).Visible = False
+End If
+
+Application.ScreenUpdating = True
+End Function
+-------------------------------------------------------------------------------
+VBA MACRO Feuil16.cls 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/Feuil16'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+(empty macro)
+-------------------------------------------------------------------------------
+VBA MACRO Calendrier_MiseEnForme_mod.bas 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/Calendrier_MiseEnForme_mod'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Option Explicit
+
+Public Function Calendrier_MiseEnForme()
+
+constantes_generales
+Dim nb_jours As Long
+Dim r_bord(1 To 12), RT(1 To 10), med_init As String
+
+Application.ScreenUpdating = False
+Stop_protect
+UnloadAllForms
+Application.EnableEvents = False
+
+G_sh(1).Select
+
+'                   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+'                   !!!!! MISE EN FORME BORDURES !!!!!
+'                   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+'On définit le range pour chaque mois et on applique les bordures
+For i = 1 To 12
+        For u = 1 To 12
+        r_bord(u) = G_col_bord(2 * u - 1) & G_firstrow(i) & ":" & G_col_bord(2 * u) & G_lastrow(i)
+               With G_sh(1).Range(r_bord(u))
+                .Borders(xlEdgeTop).Weight = xlThick
+                .Borders(xlEdgeBottom).Weight = xlThick
+                .Borders(xlInsideHorizontal).Weight = xlThin
+                .Borders(xlInsideVertical).Weight = xlThin
+                .Borders(xlEdgeLeft).Weight = xlThick
+                .Borders(xlEdgeRight).Weight = xlThick
+            End With
+        Next u
+Next i
+
+'                   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+'                   !!!!! MISE EN FORME CONDITIONNELLE !!!!!
+'                   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+u = 1
+For i = 1 To 10
+RT(i) = G_col_calend(2 * i - 1) & G_firstrow(1) & ":" & G_col_calend(2 * i) & G_lastrow(12)
+Next i
+
+Range("A1:CE500").formatconditions.Delete
+
+'Rouge hors vacances
+Range(RT(2)).Select
+Selection.formatconditions.Add Type:=xlExpression, Formula1:="=SI(OU(NB.SI($" & G_col_calend(7) & G_firstrow(u) & ":$" & G_col_calend(8) & G_firstrow(u) & ";" & G_col_calend(1) & G_firstrow(u) & ") > 0; NB.SI($" & G_col_calend(15) & G_firstrow(u) & ":$" & G_col_calend(16) & G_firstrow(u) & ";" & G_col_calend(1) & G_firstrow(u) & ") > 0 ); ""VRAI""; ""FAUX"")"
+formatconditions "N2", 2, 0, 0
+
+'Range(RT(3)).Select
+'Selection.formatconditions.Add Type:=xlExpression, Formula1:="=SI(NB.SI($" & G_col_calend(7) & G_firstrow(u) & ":$" & G_col_calend(8) & G_firstrow(u) & ";" & G_col_calend(5) & G_firstrow(u) & ") > 0; ""VRAI""; ""FAUX"")"
+'formatconditions "N2", 2, 0, 0
+
+'Rouge si Demi-garde
+Range("D9:D373,F9:F373,H9:H373,J9:J373,L9:L373,N9:N373,P9:P373,R9:R373,T9:T373").Select
+Selection.formatconditions.Add Type:=xlExpression, Formula1:="=SI(ET(NON(ESTVIDE(" & G_col_calend(1) & G_firstrow(u) & "));" & G_col_calend(1) & G_firstrow(u) & "= $AA" & G_firstrow(u) - 1 & ") ; VRAI; FAUX)"
+formatconditions "N2", 2, 0, 0
+
+'Rouge lors vacances
+Range(RT(4)).Select
+Selection.formatconditions.Add Type:=xlExpression, Formula1:="=SI(NB.SI($" & G_col_calend(1) & G_firstrow(u) & ":$" & G_col_calend(2) & G_firstrow(u) & ";" & G_col_calend(7) & G_firstrow(u) & ") > 1;""VRAI"";""FAUX"")"
+formatconditions "N2", 2, 0, 0
+
+
+'Range(RT(8)).Select
+'Selection.formatconditions.Add Type:=xlExpression, Formula1:="=SI(NB.SI($" & G_col_calend(1) & G_firstrow(u) & ":$" & G_col_calend(2) & G_firstrow(u) & ";" & G_col_calend(15) & G_firstrow(u) & ") > 1;""VRAI"";""FAUX"")"
+'formatconditions "N2", 2, 0, 0
+
+'Couleurs médecins
+Range(RT(1)).Select
+For i = 2 To 30
+    If Not IsEmpty(G_sh(3).Range("A" & i).Value) Then
+        med_init = G_sh(3).Range("C" & i).Value
+        Selection.formatconditions.Add Type:=xlExpression, Formula1:="=SI(" & G_col_calend(1) & G_firstrow(u) & "=""" & med_init & """;""VRAI"";""FAUX"")"
+        formatconditions "F" & i, 0, 0, 0
+    End If
+Next i
+
+'Couleurs internes
+For i = 2 To 30
+    If Not IsEmpty(G_sh(4).Range("A" & i).Value) Then
+        med_init = G_sh(4).Range("C" & i).Value
+        Selection.formatconditions.Add Type:=xlExpression, Formula1:="=SI(" & G_col_calend(1) & G_firstrow(u) & "=""" & med_init & """;""VRAI"";""FAUX"")"
+        formatconditions "D" & i, 1, 0, 0
+    End If
+Next i
+
+'Jours Week-end gris
+Selection.formatconditions.Add Type:=xlExpression, Formula1:="=SI(OU(JOURSEM($" & G_col_calend(10) & G_firstrow(u) & ")=1; JOURSEM($C" & G_firstrow(u) & ")=7); ""VRAI""; ""FAUX"")"
+formatconditions "N3", 2, 0, 0
+
+'Jours fériés bleu clair
+Selection.formatconditions.Add Type:=xlExpression, Formula1:="=NB.SI(Paramètres!$R$2:$R$14;$" & G_col_calend(10) & G_firstrow(u) & ")"
+formatconditions "N4", 2, 0, 0
+
+'Rouge si vide - Urgences
+Range(RT(6)).Select
+Selection.formatconditions.Add Type:=xlExpression, Formula1:="=SI(" & G_col_calend(11) & G_firstrow(u) & "= """"; VRAI; FAUX)"
+formatconditions "N5", 2, 0, 0
+
+'Rouge si vide - Astreintes
+Range(RT(7)).Select
+Selection.formatconditions.Add Type:=xlExpression, Formula1:="=SI(" & G_col_calend(13) & G_firstrow(u) & "= """"; VRAI; FAUX)"
+formatconditions "N5", 2, 0, 0
+
+'Rouge si vide - internes
+Range(RT(9)).Select
+Selection.formatconditions.Add Type:=xlExpression, Formula1:="=SI(" & G_col_calend(17) & G_firstrow(u) & "= """"; VRAI; FAUX)"
+formatconditions "N5", 2, 0, 0
+
+'Date du jour rouge
+Range(RT(5)).Select
+Selection.formatconditions.Add Type:=xlExpression, Formula1:="=SI(ET(MOIS(AUJOURDHUI())=MOIS($C" & G_firstrow(u) & "); JOUR(AUJOURDHUI())=JOUR($C" & G_firstrow(u) & ")); VRAI; FAUX)"
+formatconditions "N6", 2, 0, 0
+
+'Menu gris
+Selection.formatconditions.Add Type:=xlExpression, Formula1:="=SI(OU(JOURSEM($" & G_col_calend(10) & G_firstrow(u) & ")=1; JOURSEM($C" & G_firstrow(u) & ")=7); ""VRAI""; ""FAUX"")"
+formatconditions "N7", 2, 0, 0
+
+'Menu bleu
+Selection.formatconditions.Add Type:=xlExpression, Formula1:="=NB.SI(Paramètres!$R$2:$R$14;$" & G_col_calend(10) & G_firstrow(u) & ")"
+formatconditions "N8", 2, 0, 0
+
+'Menu blanc
+Selection.formatconditions.Add Type:=xlExpression, Formula1:="=SI(ET(JOURSEM($" & G_col_calend(10) & G_firstrow(u) & ")>1; JOURSEM($" & G_col_calend(10) & G_firstrow(u) & ")<7); ""VRAI""; ""FAUX"")"
+formatconditions "N9", 2, 0, 0
+
+Rows("9:374").EntireRow.AutoFit
+
+Application.EnableEvents = True
+Start_protect
+Application.ScreenUpdating = True
+
+End Function
+
+Public Function formatconditions(cell_cond As String, choixsheet As String, bordures_none As Integer, priority As Integer)
+Dim choose_sh As Worksheet
+
+If choixsheet = 0 Then
+Set choose_sh = G_sh(3)
+ElseIf choixsheet = 1 Then
+Set choose_sh = G_sh(4)
+ElseIf choixsheet = 2 Then
+Set choose_sh = G_sh(2)
+End If
+
+With Selection.formatconditions(Selection.formatconditions.Count)
+    .Font.color = choose_sh.Range(cell_cond).Font.color
+    .Interior.PatternColorIndex = xlAutomatic
+    .Interior.color = choose_sh.Range(cell_cond).Interior.color
+End With
+
+If bordures_none = 1 Then
+With Selection.formatconditions(Selection.formatconditions.Count)
+    .Borders(xlLeft).LineStyle = xlNone
+    .Borders(xlRight).LineStyle = xlNone
+    .Borders(xlBottom).LineStyle = xlNone
+End With
+End If
+
+If priority = 1 Then
+Selection.formatconditions(Selection.formatconditions.Count).SetFirstPriority
+End If
+
+End Function
+-------------------------------------------------------------------------------
+VBA MACRO Feuil4.cls 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/Feuil4'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+(empty macro)
+-------------------------------------------------------------------------------
+VBA MACRO Astreintes_presences.bas 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/Astreintes_presences'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Option Explicit
+
+Public Sub Maj_recap_astreintes()
+
+Application.ScreenUpdating = False
+Stop_protect
+
+Dim rng, cell, C, A, B, range_initiales As Range
+Dim firstblank, col_select, row_select, Row_Previous_Saturday, Row_Next_Sunday, joursemaine As Long
+Dim initiales, pref As String
+
+col_select = ActiveCell.Column
+row_select = ActiveCell.Row
+
+constantes_generales
+
+For u = 1 To 18
+    UserFormAstreintes.Controls("commandbutton" & u).Caption = ""
+    UserFormAstreintes.Controls("TextBoxast" & u).Value = ""
+    UserFormAstreintes.TextBoxjour.Value = ""
+    UserFormAstreintes.Controls("commandbutton" & u).BackColor = RGB(255, 255, 255)
+Next u
+
+Set rng = Range("Tableau19").ListObject.ListColumns(1).DataBodyRange
+On Error Resume Next
+Set cell = rng.SpecialCells(xlCellTypeBlanks)(1)
+    firstblank = cell.Row
+On Error GoTo 0
+Set rng = Nothing: Set cell = Nothing
+
+UserFormAstreintes.ListBox2.List = Range("Récapitulatif!B1:F" & (firstblank - 1)).Value
+
+If Not col_select = 22 Then
+GoTo fin
+End If
+
+'On récupère le jour de la semaine
+joursemaine = Weekday(G_sh(1).Range("C" & row_select).Value)
+
+If joursemaine = 1 Or joursemaine = 6 Or joursemaine = 7 Then
+GoTo fin
+
+Else
+Row_Previous_Saturday = row_select - joursemaine
+Row_Next_Sunday = Row_Previous_Saturday + 8
+
+'Affichage du jour sélectionné
+UserFormAstreintes.TextBoxjour.Value = Format(G_sh(1).Range("C" & row_select).Value, "dddd") & " " & G_sh(1).Range("C" & row_select).Value
+
+'On recherche si médecin en vacances ou si médecins déjà d'astreintes (WE autour et semaine en cours)
+'Si médecin peut faire l'astreinte, on affiche les initiales et mise en couleur en fonction préférences de jour de semaine
+u = 1
+For i = 2 To 20
+If G_sh(3).Cells(i, 3) <> "" Then
+   initiales = G_sh(3).Range("C" & i).Value
+   Set C = G_sh(1).Range("AV" & row_select & ":BC" & row_select).Find(What:=initiales, LookIn:=xlValues)
+   Set A = G_sh(1).Range("V" & Row_Previous_Saturday & ":W" & Row_Next_Sunday).Find(What:=initiales, LookIn:=xlValues)
+    Set B = Nothing
+    If UserFormAstreintes.CheckBox1.Value = True Then
+       Set B = G_sh(1).Range("BL" & row_select & ":BS" & row_select).Find(What:=initiales, LookIn:=xlValues)
+    End If
+   If C Is Nothing And A Is Nothing And B Is Nothing Then
+        UserFormAstreintes.Controls("commandbutton" & u).Caption = initiales
+        Set range_initiales = G_sh(3).Columns(3).Cells.Find(What:=initiales)
+        pref = G_sh(3).Cells(range_initiales.Row, joursemaine + 5).Value
+
+            If pref Like "Oui" Then
+                UserFormAstreintes.Controls("commandbutton" & u).BackColor = RGB(0, 255, 0)
+            ElseIf pref = "Non" Then
+                UserFormAstreintes.Controls("commandbutton" & u).BackColor = RGB(255, 0, 0)
+            ElseIf pref = "OK" Then
+                UserFormAstreintes.Controls("commandbutton" & u).BackColor = RGB(255, 255, 0)
+            End If
+
+        UserFormAstreintes.Controls("textboxast" & u).Value = G_sh(8).Range("C" & range_initiales.Row).Value
+        u = u + 1
+    End If
+End If
+Next i
+End If
+
+fin:
+Start_protect
+Application.ScreenUpdating = True
+End Sub
+
+Public Sub ok_jour_suivant(USF As Object, buttonnum As Integer)
+
+If USF.Controls("commandbutton" & buttonnum).Caption = "" Then
+Exit Sub
+End If
+
+ActiveCell.Value = USF.Controls("commandbutton" & buttonnum).Caption
+
+Dim row_select, Week_day As Long
+row_select = ActiveCell.Row
+Week_day = Weekday(CDate(Range("C" & row_select).Value), 2) 'Jour de la semaine
+
+If Week_day < 4 Then
+ActiveCell.Offset(1, 0).Select
+ElseIf Week_day = 4 Then
+ActiveCell.Offset(4, 0).Select
+ElseIf Week_day = 5 Then
+ActiveCell.Offset(3, 0).Select
+ElseIf Week_day = 6 Then
+ActiveCell.Offset(2, 0).Select
+ElseIf Week_day = 7 Then
+ActiveCell.Offset(1, 0).Select
+End If
+
+End Sub
+-------------------------------------------------------------------------------
+VBA MACRO mod_changemonthcolor.bas 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/mod_changemonthcolor'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Option Explicit
+
+Public Sub changemonthcolor(USF As Object, nb_button As Integer)
+Application.ScreenUpdating = False
+constantes_generales
+Stop_protect
+
+Dim ancient_button As String
+ancient_button = G_sh(2).Range("R18").Value
+G_sh(2).Range("R18").Value = nb_button
+
+USF.Controls("commandbutton" & ancient_button).BackColor = RGB(240, 240, 240)
+USF.Controls("commandbutton" & nb_button).BackColor = RGB(128, 210, 128)
+
+Start_protect
+Application.ScreenUpdating = True
+End Sub
+-------------------------------------------------------------------------------
+VBA MACRO Feuilles_Protect.bas 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/Feuilles_Protect'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Option Explicit
+
+Sub Stop_protect()
+Attribute Stop_protect.VB_ProcData.VB_Invoke_Func = " \n14"
+Dim i As Long
+For i = 1 To Sheets.Count
+    Sheets(i).Unprotect ("Medint")
+Next i
+End Sub
+
+Sub Start_protect()
+Application.ScreenUpdating = False
+Dim sh As Worksheet
+For Each sh In ThisWorkbook.Worksheets
+    If sh.Name = "Calendrier" Or sh.Name = "Paramètres" Or sh.Name = "Liste medecins" _
+    Or sh.Name = "Liste internes" Or sh.Name = "Astreinte Administration" _
+    Or sh.Name = "Urgences" Or sh.Name = "Astreinte AVEC" Or sh.Name = "Récapitulatif" _
+    Or sh.Name = "Répartition" Then
+        
+        sh.Protect "Medint", AllowFiltering:=True, AllowFormattingRows:=True
+        
+    End If
+
+Next sh
+
+Application.ScreenUpdating = True
+End Sub
+
+-------------------------------------------------------------------------------
+VBA MACRO UserFormAstreintes.frm 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/UserFormAstreintes'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Private Sub CommandButton19_Click()
+Unload Me
+UserFormParametres.Show 0
+End Sub
+
+Private Sub UserForm_Initialize()
+Maj_recap_astreintes
+End Sub
+Private Sub CheckBox1_Click()
+Maj_recap_astreintes
+End Sub
+Private Sub CommandButton1_Click()
+ok_jour_suivant Me, 1
+End Sub
+Private Sub CommandButton2_Click()
+ok_jour_suivant Me, 2
+End Sub
+Private Sub CommandButton3_Click()
+ok_jour_suivant Me, 3
+End Sub
+Private Sub CommandButton4_Click()
+ok_jour_suivant Me, 4
+End Sub
+Private Sub commandbutton5_click()
+ok_jour_suivant Me, 5
+End Sub
+Private Sub commandbutton6_click()
+ok_jour_suivant Me, 6
+End Sub
+Private Sub commandbutton7_click()
+ok_jour_suivant Me, 7
+End Sub
+Private Sub commandbutton8_click()
+ok_jour_suivant Me, 8
+End Sub
+Private Sub commandbutton9_click()
+ok_jour_suivant Me, 9
+End Sub
+Private Sub commandbutton10_click()
+ok_jour_suivant Me, 10
+End Sub
+Private Sub commandbutton11_click()
+ok_jour_suivant Me, 11
+End Sub
+Private Sub commandbutton12_click()
+ok_jour_suivant Me, 12
+End Sub
+Private Sub commandbutton13_click()
+ok_jour_suivant Me, 13
+End Sub
+Private Sub commandbutton14_click()
+ok_jour_suivant Me, 14
+End Sub
+Private Sub commandbutton15_click()
+ok_jour_suivant Me, 15
+End Sub
+Private Sub CommandButton16_Click()
+ok_jour_suivant Me, 16
+End Sub
+Private Sub CommandButton17_Click()
+ok_jour_suivant Me, 17
+End Sub
+Private Sub CommandButton18_Click()
+ok_jour_suivant Me, 18
+End Sub
+
+Private Sub CommandButton_next_Click()
+On Error GoTo ierror
+Dim row_select, Week_day As Long
+row_select = ActiveCell.Row
+Week_day = Weekday(CDate(Range("C" & row_select).Value), 2) 'Jour de la semaine
+
+If Week_day < 4 Then
+ActiveCell.Offset(1, 0).Select
+ElseIf Week_day = 4 Then
+ActiveCell.Offset(4, 0).Select
+ElseIf Week_day = 5 Then
+ActiveCell.Offset(3, 0).Select
+ElseIf Week_day = 6 Then
+ActiveCell.Offset(2, 0).Select
+ElseIf Week_day = 7 Then
+ActiveCell.Offset(1, 0).Select
+End If
+ierror:
+End Sub
+Private Sub CommandButton_previous_Click()
+On Error GoTo ierror
+
+Dim row_select, Week_day As Long
+row_select = ActiveCell.Row
+Week_day = Weekday(CDate(Range("C" & row_select).Value), 2) 'Jour de la semaine
+
+If Week_day = 1 Then
+ActiveCell.Offset(-4, 0).Select
+ElseIf Week_day < 6 Then
+ActiveCell.Offset(-1, 0).Select
+ElseIf Week_day = 6 Then
+ActiveCell.Offset(-2, 0).Select
+ElseIf Week_day = 7 Then
+ActiveCell.Offset(-3, 0).Select
+End If
+ierror:
+End Sub
+
+-------------------------------------------------------------------------------
+VBA MACRO unload_userform.bas 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/unload_userform'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Option Explicit
+
+Sub UnloadAllForms()
+Dim myForm As UserForm
+For Each myForm In UserForms
+Unload myForm
+Next
+End Sub
+-------------------------------------------------------------------------------
+VBA MACRO Feuil15.cls 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/Feuil15'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+(empty macro)
+-------------------------------------------------------------------------------
+VBA MACRO UserFormParametres.frm 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/UserFormParametres'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Option Explicit
+
+Private Sub CommandButton27_Click()
+Export_Pdf "Repart"
+End Sub
+
+Private Sub UserForm_Initialize()
+changemonthcolor Me, Month(Date)
+End Sub
+Private Sub CommandButton1_Click()
+changemonthcolor Me, 1
+End Sub
+Private Sub CommandButton2_Click()
+changemonthcolor Me, 2
+End Sub
+Private Sub CommandButton3_Click()
+changemonthcolor Me, 3
+End Sub
+Private Sub CommandButton4_Click()
+changemonthcolor Me, 4
+End Sub
+Private Sub commandbutton5_click()
+changemonthcolor Me, 5
+End Sub
+Private Sub commandbutton6_click()
+changemonthcolor Me, 6
+End Sub
+Private Sub commandbutton7_click()
+changemonthcolor Me, 7
+End Sub
+Private Sub commandbutton8_click()
+changemonthcolor Me, 8
+End Sub
+Private Sub commandbutton9_click()
+changemonthcolor Me, 9
+End Sub
+Private Sub commandbutton10_click()
+changemonthcolor Me, 10
+End Sub
+Private Sub commandbutton11_click()
+changemonthcolor Me, 11
+End Sub
+Private Sub commandbutton12_click()
+changemonthcolor Me, 12
+End Sub
+Private Sub commandbutton13_click()
+Export_Pdf "Administration"
+End Sub
+Private Sub commandbutton14_click()
+Export_Pdf "Urgences"
+End Sub
+Private Sub commandbutton15_click()
+Unload UserFormParametres
+constantes_generales
+G_sh(7).Visible = True
+G_sh(7).Select
+End Sub
+Private Sub CommandButton16_Click()
+Unload Me
+UserFormAstreintes.Show 0
+End Sub
+Private Sub CommandButton17_Click()
+Unload Me
+UserFormnuitswe.Show 0
+End Sub
+Private Sub CommandButton18_Click()
+Unload Me
+UserFormRemplas.Show 0
+End Sub
+Private Sub CommandButton19_Click()
+Unload Me
+UserFormStype.Show 0
+End Sub
+Private Sub commandbutton20_click()
+Unload Me
+Calendrier_MiseEnForme
+End Sub
+Private Sub commandbutton21_click()
+Unload UserFormParametres
+Application.ScreenUpdating = False
+Stop_protect
+Application.ScreenUpdating = True
+End Sub
+Private Sub CommandButton23_Click()
+constantes_generales
+G_sh(3).Visible = True
+G_sh(3).Select
+End Sub
+Private Sub CommandButton24_Click()
+Unload UserFormParametres
+constantes_generales
+G_sh(4).Visible = True
+G_sh(4).Select
+End Sub
+Private Sub CommandButton25_Click()
+Dim text_box As String
+Dim year_select As Long
+text_box = Me.TextBox1.Value
+
+If IsNumeric(text_box) = True Then
+    year_select = text_box
+    If year_select > 2000 And year_select < 2100 Then
+        If MsgBox("Vous allez perdre les modifications en cours. Si nécessaire, veuillez enregistrer le fichier avant de relancer la manipulation. Voulez-vous continuer ?", vbYesNo) = vbYes Then
+            changeyear year_select
+        End If
+    Else
+        MsgBox "Veuillez saisir une année comprise entre 2001 et 2099 !"
+    End If
+Else
+    MsgBox "Veuillez saisir une année au format aaaa (Exemple : 2024) !"
+End If
+End Sub
+Private Sub CommandButton26_Click()
+UserFormsecteurs.Show 0
+Unload UserFormParametres
+End Sub
+-------------------------------------------------------------------------------
+VBA MACRO Feuil3.cls 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/Feuil3'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Option Explicit
+
+Private Sub CommandButton1_Click()
+Worksheets("calendrier").Select
+End Sub
+
+Private Sub CommandButton2_Click()
+Worksheets("calendrier").Select
+UserFormParametres.Show 0
+End Sub
+-------------------------------------------------------------------------------
+VBA MACRO UserFormStype.frm 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/UserFormStype'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+Option Explicit
+
+Private Sub CommandButton25_Click()
+Unload Me
+UserFormParametres.Show 0
+End Sub
+
+Private Sub UserForm_Initialize()
+constantes_generales
+
+Application.ScreenUpdating = False
+u = 1
+For i = 2 To 25
+If G_sh(3).Cells(i, 13).Value = "Oui" Then
+Me.Controls("Commandbutton" & u).Caption = G_sh(3).Cells(i, 3).Value
+Me.Controls("Commandbutton" & u).BackColor = G_sh(3).Cells(i, 6).Interior.color
+Me.Controls("Commandbutton" & u).ForeColor = G_sh(3).Cells(i, 6).Font.color
+u = u + 1
+End If
+Next i
+
+If u < 14 Then
+UserFormStype.Height = 131
+ElseIf u < 18 Then
+UserFormStype.Height = 158
+ElseIf u < 22 Then
+UserFormStype.Height = 189
+Else
+UserFormStype.Height = 220
+End If
+
+Application.ScreenUpdating = True
+End Sub
+Private Sub CommandButton1_Click()
+Copiercollerstype Me.CommandButton1.Caption
+End Sub
+Private Sub CommandButton2_Click()
+Copiercollerstype Me.CommandButton2.Caption
+End Sub
+Private Sub CommandButton3_Click()
+Copiercollerstype Me.CommandButton3.Caption
+End Sub
+Private Sub CommandButton4_Click()
+Copiercollerstype Me.CommandButton4.Caption
+End Sub
+Private Sub commandbutton5_click()
+Copiercollerstype Me.CommandButton5.Caption
+End Sub
+Private Sub commandbutton6_click()
+Copiercollerstype Me.CommandButton6.Caption
+End Sub
+Private Sub commandbutton7_click()
+Copiercollerstype Me.CommandButton7.Caption
+End Sub
+Private Sub commandbutton8_click()
+Copiercollerstype Me.CommandButton8.Caption
+End Sub
+Private Sub commandbutton9_click()
+Copiercollerstype Me.CommandButton9.Caption
+End Sub
+Private Sub commandbutton10_click()
+Copiercollerstype Me.CommandButton10.Caption
+End Sub
+Private Sub commandbutton11_click()
+Copiercollerstype Me.CommandButton11.Caption
+End Sub
+Private Sub commandbutton12_click()
+Copiercollerstype Me.CommandButton12.Caption
+End Sub
+Private Sub commandbutton13_click()
+Copiercollerstype Me.CommandButton13.Caption
+End Sub
+Private Sub commandbutton14_click()
+Copiercollerstype Me.CommandButton14.Caption
+End Sub
+Private Sub commandbutton15_click()
+Copiercollerstype Me.CommandButton15.Caption
+End Sub
+Private Sub CommandButton16_Click()
+Copiercollerstype Me.CommandButton16.Caption
+End Sub
+Private Sub CommandButton17_Click()
+Copiercollerstype Me.CommandButton17.Caption
+End Sub
+Private Sub CommandButton18_Click()
+Copiercollerstype Me.CommandButton18.Caption
+End Sub
+Private Sub CommandButton19_Click()
+Copiercollerstype Me.CommandButton19.Caption
+End Sub
+Private Sub commandbutton20_click()
+Copiercollerstype Me.CommandButton20.Caption
+End Sub
+Private Sub commandbutton21_click()
+Copiercollerstype Me.CommandButton21.Caption
+End Sub
+Private Sub commandbutton22_click()
+Copiercollerstype Me.CommandButton22.Caption
+End Sub
+Private Sub CommandButton23_Click()
+Copiercollerstype Me.CommandButton23.Caption
+End Sub
+Private Sub CommandButton24_Click()
+Copiercollerstype Me.CommandButton24.Caption
+End Sub
+
+
+
+-------------------------------------------------------------------------------
+VBA MACRO afficher_secteurs.bas 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/afficher_secteurs'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Public Sub affichage_secteurs(USF As UserForm)
+
+Dim i As Long
+
+Application.ScreenUpdating = False
+Stop_protect
+constantes_generales
+Application.EnableEvents = False
+
+For i = 1 To 9
+If USF.Controls("Checkbox" & i).Value = True Then
+G_sh(1).Range(Columns(2 * i + 2), Columns(2 * i + 3)).Hidden = False
+Else
+G_sh(1).Range(Columns(2 * i + 2), Columns(2 * i + 3)).Hidden = True
+End If
+
+If USF.Controls("Checkbox" & (i + 9)).Value = True Then
+G_sh(1).Range(Columns(2 * i + 28), Columns(2 * i + 29)).Hidden = False
+Else
+G_sh(1).Range(Columns(2 * i + 28), Columns(2 * i + 29)).Hidden = True
+End If
+Next i
+
+G_sh(9).Visible = True
+G_sh(9).Select
+For i = 1 To 9
+If USF.Controls("Checkbox" & (i + 9)).Value = True Then
+G_sh(9).Range(Columns(2 * i + 1), Columns(2 * i + 2)).Hidden = False
+Else
+G_sh(9).Range(Columns(2 * i + 1), Columns(2 * i + 2)).Hidden = True
+End If
+Next i
+
+G_sh(9).Visible = False
+G_sh(1).Select
+
+Application.EnableEvents = True
+Start_protect
+Application.ScreenUpdating = True
+End Sub
+-------------------------------------------------------------------------------
+VBA MACRO UserFormsecteurs.frm 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/UserFormsecteurs'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Option Explicit
+
+Private Sub CommandButton1_Click()
+affichage_secteurs Me
+End Sub
+
+Private Sub CommandButton19_Click()
+Unload Me
+UserFormParametres.Show 0
+End Sub
+
+Private Sub UserForm_Initialize()
+Dim i As Long
+For i = 1 To 17 Step 2
+    If Columns(3 + i).EntireColumn.Hidden = False Then
+        Me.Controls("checkbox" & (i + 1) / 2).Value = True
+    End If
+    If Columns(29 + i).EntireColumn.Hidden = False Then
+        Me.Controls("checkbox" & ((i + 1) / 2) + 9).Value = True
+    End If
+Next i
+End Sub
+-------------------------------------------------------------------------------
+VBA MACRO Feuil5.cls 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/Feuil5'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Option Explicit
+
+Private Sub CommandButton1_Click()
+Worksheets("calendrier").Select
+End Sub
+
+Private Sub CommandButton2_Click()
+Worksheets("calendrier").Select
+UserFormParametres.Show 0
+End Sub
+-------------------------------------------------------------------------------
+VBA MACRO Feuil10.cls 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/Feuil10'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+(empty macro)
+-------------------------------------------------------------------------------
+VBA MACRO Feuil17.cls 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/Feuil17'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+(empty macro)
+-------------------------------------------------------------------------------
+VBA MACRO Feuil8.cls 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/Feuil8'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+(empty macro)
+-------------------------------------------------------------------------------
+VBA MACRO Feuil11.cls 
+in file: xl/vbaProject.bin - OLE stream: 'VBA/Feuil11'
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+(empty macro)
+-------------------------------------------------------------------------------
