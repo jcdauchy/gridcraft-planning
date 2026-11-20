@@ -1,41 +1,60 @@
-
 Planning en hospitalisation médecine interne et polyvalente
 
 
 Organisation de semaine (lundi à vendredi)
 -	5 secteurs d’hospitalisation
--	Médecine 3ème: 2 secteurs
+-	Médecine 3ème: 2 secteurs gérés par 3 seniors et 2 seniors sur les jours off
 -	Médecins 4ème: 3 secteurs 
 -	1 médecin aux urgences
--	Un interne par secteur dans la limite du nombre d'interne. Il existe donc des secteurs avec interne et sans interne.
+-	Un interne par secteur dans la limite du nombre d'interne. Il existe donc des secteurs avec interne et sans interne. Les internes sont localisés en priorité au 4ème
 
 Organisation en fonction du nombre d’internes 
 -	Avec 5 internes ou plus : 1 senior sur chaque secteur
 -	Avec 4 internes (donc 3 effectifs) :
--	Positionnement des internes au 4ème étage
--	3 seniors en tout au 3ème étage (qui décalent leur jour off si besoin pour être toujours au moins 2 présents) 
--	1 senior sur chaque secteur au 4ème étage = 3 seniors au 4ème
+	-	Positionnement des internes au 4ème étage
+	-	3 seniors en tout au 3ème étage (qui décalent leur jour off si besoin pour être toujours au moins 2 présents) 
+	-	1 senior sur chaque secteur au 4ème étage = 3 seniors au 4ème
 -	Avec 3 internes ou moins (donc 2 effectifs) :
--	Positionnement des internes au 3ème étage
--	1 sénior sur chaque secteur au 3ème étage = 2 séniors en tout
--	4 séniors en tout au 4ème étage, qui fonctionnent en binôme pour se remplacer (décalent leur jour off si besoin pour être toujours au moins 1 présent)
+	-	Positionnement des internes au 3ème étage
+	-	1 sénior sur chaque secteur au 3ème étage = 2 séniors en tout
+	-	4 séniors en tout au 4ème étage, qui fonctionnent en binôme pour se remplacer (décalent leur jour off si besoin pour être toujours au moins 1 présent)
 
 Organisation des nuits
 1 médecin d’astreinte chaque nuit du lundi au jeudi. Pas plus d’1 astreinte par semaine. Pas d’astreinte de nuit les 2 jours précédents et suivant un WE d’astreinte.
-Chaque médecin a le mêmenombre d'astreinte de nuit.
+Chaque médecin a le même nombre d'astreinte de nuit.
+
+Restrictions d'astreinte de nuit par médecin :
+-	VAL : pas d'astreinte le jeudi
+-	MEI : pas d'astreinte le jeudi
+-	CHE : pas d'astreinte le mercredi
+-	COS : pas d'astreinte le jeudi
+-	ELZ : pas d'astreinte lundi et mardi
+-	VER : pas d'astreinte mardi ni mercredi
+-	VIN : astreinte uniquement le mardi soir
+-	GIE : pas d'astreinte mardi ni mercredi
+-	CLA : pas d'astreinte mardi ni mercredi
+-	MAL : pas d'astreinte le jeudi
+-	LAM : pas d'astreinte le jeudi
+-	SHA : pas d'astreinte le mercredi
+-	BEC : pas d'astreinte le mercredi ni jeudi
+-	CAR : pas d'astreinte mercredi ni jeudi
+-	DEU : pas d'astreinte le jeudi
+-	GAR : pas d'astreinte mercredi ni jeudi
+-	CON : pas d'astreinte
+-	FOR : pas d'astreinte
 
 Organisation des WE et les jours fériés :
 -	2 médecins/WE et jours fériés en journée. Inclus dans le temps de travail hebdomadaire, mais max de 6 journées consécutives travaillées puis obligatoirement 1 journée de repos: législation du travail sur le repos “dominical”). La “grande astreinte” travaille les 2 jours complets + nuits de vendredi et dimanche. La “petite astreinte” travaille samedi journée complète et dimanche matin + nuits de samedi.
--	Chaque médecin a le même nombre d'astreinte de WE, sauf pour les endoc : 1 WE de moins par an
+-	Chaque médecin a le même nombre d'astreinte de WE, sauf pour les endoc : 1 WE de moins par an. Dr Forestier (FOR) et Dr Contamin (CON) ne font pas d'astreinte de WE ni jours fériés.
 
 Equipe : 
 Composition 
 -	Médecins internistes: Drs Amandine Forestier (FOR), Stéphane Vinzio (VIN), Mélodie Valière (VAL), Marie Meignien (MEI), Clémence Carron (CAR).
 -	Médecins polyvalents: Drs Anne-Sophie Lecler (LEC), Jeanne Monnier (MON), Violaine Cheilan (CHE).
--	Médecins néphrologues: Drs Claudine Contamin (CON), Valentine Gierczak (GIE).
+-	Médecins néphrologues: Drs Claudine Contamin (CON), Valentine Gierczak (GIE), Dr Louise Deucennick (DEU).
 -	Médecins infectiologues: Drs Nastasia El Zeenni (ELZ), Etienne Garneret (GAR), Coleen Beck (BEC)
 -	Médecins rhumatologues: Drs Marine Clay (CLA), Baptiste Coste (COS), Joseph Lambert (LAM)
--	Médecins endocrinologues: Drs Marie Vernin (VER), Julie Mallaret (MAL) (cette spécialité ne participe pas à l'hospitalisation ni aux urgences mais participe à la continuité/permanence de soins (astreintes de nuit + travail les WE et jours fériés).
+-	Médecins endocrinologues: Drs Marie Vernin (VER), Julie Mallaret (MAL), Dr Claire Sharon (SHA) (cette spécialité ne participe pas à l'hospitalisation ni aux urgences mais participe à la continuité/permanence de soins (astreintes de nuit + travail les WE et jours fériés).
 
 Jours de temps partiel (jour off)
 -	Amandine Forestier : absente les mercredis semaines paires/absente les jeudis semaines impaires
@@ -59,7 +78,7 @@ Jours de consultation :
 -	VIN : lundi après-midi semaines paires, jeudi matin, mercredi matin semaines impaires
 -	VAL : lundi après-midi, mercredi après-midi semaines impaires, jeudi après-midi semaines paires, vendredi après-midi (allergo)
 -	MEI :  mercredi toute la journée, lundi après-midi
--	CAR : 
+-	CAR : pas de consultation
 -	ELZ : jeudi matin, mercredi matin semaines paires, vendredi matin semaines impaires
 -	GAR : jeudi après-midi, mercredi matin semaines impaires, vendredi matin semaines paires
 -	BEC : mardi aprem et mercredi matin (décalage mercredi aprem possible)
@@ -68,8 +87,8 @@ Jours de consultation :
 -	COS : mercredi matin et jeudi après-midi. Mardi après-midi pour infiltration + écho. Toujours laisser un des rhumatos dispo le mardi matin (ostéoporose).
 -	CON : lundi toute la journée, mardi toute la journée, jeudi toute la journée, vendredi matin semaines paires
 -	GIE : mardi après-midi et jeudi après-midi.
--	LEC
--	CHE
+-	LEC : pas de consultation
+-	CHE : pas de consultation
 
 Hospitalisation (du lundi au vendredi)
 1.	Chaque jour est divisé en matin et après-midi.
@@ -79,7 +98,7 @@ Il est obligatoire qu’il y ait un médecin posté sur chaque secteur, chaque j
 
 3.	Unicité
 Un médecin ne peut être que sur un secteur à la fois.
-Exception : si pas d’autre possibilité, il est possible qu'un médecin soit sur 2 secteurs si ces deux secteurs sont avec internes 
+Exception : si pas d’autre possibilité, il est possible qu'un médecin soit sur 2 secteurs si ces deux secteurs sont avec internes
 
 4.	Equité
 Il doit y avoir une équité entre les médecins
@@ -88,12 +107,12 @@ Il doit y avoir une équité entre les médecins
 Exceptions : 
 -	les infectiologues et Violaine Cheilan ont moitié moins de jours en hospitalisation
 -	Les endocrinologues ne font pas d'hospitalisation.
--	Claudine contamin : peu d’hospitalisation. Uniquement par périodes de 2 semaines max, ou sur des remplacements sur des secteurs. 
+-	Dr Contamin : peu d’hospitalisation. Uniquement par périodes de 2 semaines max, ou sur des remplacements sur des secteurs.
 
 5.	Continuité de soins : 
 -	Laisser le même médecin sur un secteur autant que possible (sauf si absent) = médecin référent
 -	Un secteur doit avoir le même médecin au moins 6 demi-journées de la semaine
--	Maintien d'un même médecin sur un secteur donné pendant 3 semaines dans l'idéal, à défaut 2 ou 4 semaines
+-	Maintien d'un même médecin sur un secteur donné pendant 3 semaines dans l'idéal, à défaut 2 ou 4 semaines, jamais plus de 4 semaines.
 
 6.	Absences 
 -	Impossibilité de poster un médecin en congés /  en formation / sur son jour off 

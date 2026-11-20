@@ -1,0 +1,34 @@
+Y a-t-il des contradictions dans les règles ?
+
+Oui, j’en ai relevé quelques-unes, et plusieurs ambiguïtés qui rendent des règles invérifiables. Je n’ai modifié aucun fichier.
+
+Contradictions directes
+Jour off et consultation le même jour.
+CON est absente tous les jeudis, mais consulte le jeudi toute la journée.
+VIN est absent les mercredis impairs, mais consulte le mercredi matin des semaines impaires.
+VAL est absente les mercredis impairs et les jeudis pairs, mais consulte le mercredi après-midi des semaines impaires et le jeudi après-midi des semaines paires.
+
+Soit le « jour off » ne concerne que l’hospitalisation, soit un des deux blocs est faux. Dans tous les autres cas, jour off et consultation tombent sur des jours différents.
+
+Localisation des internes.
+La règle générale dit « en priorité au 4ème ».
+Le cas « 3 internes ou moins » les place au 3ème.
+Nombre de seniors au 3ème.
+L’en-tête dit 3 seniors pour 2 secteurs, avec 2 seniors sur les jours off.
+Le cas « 3 internes ou moins » dit 2 seniors en tout, sans mécanisme de remplacement.
+« Même nombre pour chaque médecin ».
+Pour les astreintes de nuit, CON et FOR n’en font aucune, et VIN ne fait que le mardi.
+Pour les WE, FOR et CON sont exclues, et les endocrinologues font un WE de moins.
+
+Il faut définir « équité » comme « à égalité au sein du groupe éligible ».
+
+Ambiguïtés
+Consultation et hospitalisation. Rien ne dit qu’un médecin en consultation ne peut pas être posté en secteur. Or, pour VAL, 4 demi-journées de consultation plus un jour off laissent moins de 6 demi-journées disponibles. La règle « même médecin au moins 6 demi-journées par secteur » dépend donc de cette précision.
+Repos après une astreinte de nuit en semaine. Seuls les WE ont une règle d’absence le lendemain. Rien n’est dit pour les nuits du lundi au jeudi.
+Jours fériés. Ils comptent dans les décomptes, mais les règles d’absence « lundi » et « mardi après-midi » ne les mentionnent pas.
+Les 6 jours consécutifs. Un senior en secteur du lundi au vendredi qui fait un WE atteint 7 jours, sauf s’il a un jour off dans la semaine. La règle suppose donc ce jour off sans le dire.
+Durée maximale sur un secteur. « Même médecin autant que possible » (idéal 3 semaines) et « jamais plus de 4 semaines » sont compatibles, mais « jamais plus de 4 » est maintenant une règle dure, à distinguer d’une préférence.
+« 4 internes (donc 3 effectifs) » et « 3 internes ou moins (donc 2 effectifs) ». Je ne comprends pas ce que désigne « effectifs » : le nombre de secteurs avec interne, ou autre chose ?
+Incertitudes de transcription du PDF
+
+J’ai supposé que « Collen (COL) » désigne BEC (Coleen Beck) et que « GER » désigne GIE. Le PDF écrit aussi « Deucennick » alors que le planning contient « DEC (Deceuninck) ». À confirmer.
