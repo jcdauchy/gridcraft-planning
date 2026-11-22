@@ -1,0 +1,2 @@
+# Fichiers Markdown : toujours en CRLF dans le dossier de travail
+*.md text eol=crlf
